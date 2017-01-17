@@ -43,6 +43,7 @@
                 android:textAppearance="@style/TextAppearanceSecondaryItem"/>
 
             <ImageButton
+                android:id="@+id/btn_set_bg_color"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -108,12 +109,12 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btn_set_bg_color"
-        android:layout_width="wrap_content"
-        android:layout_height="43dp"
-        android:background="@drawable/bg_color_btn_mask"
-        android:layout_gravity="top|right"/>
+    <!--<ImageView-->
+        <!--android:id="@+id/btn_set_bg_color"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="43dp"-->
+        <!--android:background="@drawable/bg_color_btn_mask"-->
+        <!--android:layout_gravity="top|right"/>-->
 
     <LinearLayout
         android:id="@+id/note_bg_color_selector"
