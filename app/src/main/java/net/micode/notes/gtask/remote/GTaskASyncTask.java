@@ -22,7 +22,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaCodec;
 import android.os.AsyncTask;
+import android.provider.Settings;
 
 import net.micode.notes.R;
 import net.micode.notes.ui.NotesListActivity;
@@ -59,16 +61,18 @@ public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
 
     public void publishProgess(String message) {
         publishProgress(new String[] {
-                message
+            message
         });
     }
 
     private void showNotification(int tickerId, String content) {
-        /*
-        Notification notification = new Notification(R.drawable.notification, mContext
-                .getString(tickerId), System.currentTimeMillis());
-        notification.defaults = Notification.DEFAULT_LIGHTS;
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        Notification.Builder builder = new Notification.Builder(mContext);
+        builder.setDefaults(Notification.DEFAULT_LIGHTS);
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setContentText(mContext.getString(tickerId));
+        builder.setWhen(System.currentTimeMillis());
+        builder.setAutoCancel(true);
+
         PendingIntent pendingIntent;
         if (tickerId != R.string.ticker_success) {
             pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
@@ -78,10 +82,11 @@ public class GTaskASyncTask extends AsyncTask<Void, String, Integer> {
             pendingIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext,
                     NotesListActivity.class), 0);
         }
-        notification.setLatestEventInfo(mContext, mContext.getString(R.string.app_name), content,
-                pendingIntent);
-        mNotifiManager.notify(GTASK_SYNC_NOTIFICATION_ID, notification);
-        */
+
+        builder.setContentTitle(mContext.getString(R.string.app_name));
+        builder.setContentIntent(pendingIntent);
+
+        mNotifiManager.notify(GTASK_SYNC_NOTIFICATION_ID, builder.build());
     }
 
     @Override

@@ -82,7 +82,7 @@ public class NotesListItem extends LinearLayout {
             if (data.getType() == Notes.TYPE_FOLDER) {
                 mTitle.setText(data.getSnippet()
                         + context.getString(R.string.format_folder_files_count,
-                        data.getNotesCount()));
+                                data.getNotesCount()));
                 mAlert.setVisibility(View.GONE);
             } else {
                 mTitle.setText(DataUtils.getFormattedSnippet(data.getSnippet()));

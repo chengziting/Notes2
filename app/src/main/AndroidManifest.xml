@@ -35,7 +35,6 @@
         <activity android:name=".ui.NotesPreferenceActivity" />
         <activity android:name=".ui.DateTimePickerDialog" />
         <activity android:name=".ui.AlarmAlertActivity" />
-        <activity android:name=".ui.TestActivity"></activity>
 
 
 <!--define Provider-->

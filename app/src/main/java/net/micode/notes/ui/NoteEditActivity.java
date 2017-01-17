@@ -358,8 +358,8 @@ public class NoteEditActivity extends Activity implements OnClickListener,
                 || ev.getX() > (x + view.getWidth())
                 || ev.getY() < y
                 || ev.getY() > (y + view.getHeight())) {
-            return false;
-        }
+                    return false;
+                }
         return true;
     }
 
@@ -418,7 +418,7 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         }
 
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[] {
-                mWorkingNote.getWidgetId()
+            mWorkingNote.getWidgetId()
         });
 
         sendBroadcast(intent);
@@ -429,7 +429,8 @@ public class NoteEditActivity extends Activity implements OnClickListener,
         int id = v.getId();
         if (id == R.id.btn_set_bg_color) {
             mNoteBgColorSelector.setVisibility(View.VISIBLE);
-            findViewById(sBgSelectorSelectionMap.get(mWorkingNote.getBgColorId())).setVisibility(View.VISIBLE);
+            findViewById(sBgSelectorSelectionMap.get(mWorkingNote.getBgColorId())).setVisibility(
+                    -                    View.VISIBLE);
         } else if (sBgSelectorBtnsMap.containsKey(id)) {
             findViewById(sBgSelectorSelectionMap.get(mWorkingNote.getBgColorId())).setVisibility(
                     View.GONE);
@@ -749,20 +750,10 @@ public class NoteEditActivity extends Activity implements OnClickListener,
             item = item.substring(TAG_UNCHECKED.length(), item.length()).trim();
         }
 
-        edit.setTextViewChangeListener(this);
+        edit.setOnTextViewChangeListener(this);
         edit.setIndex(index);
         edit.setText(getHighlightQueryResult(item, mUserQuery));
         return view;
-    }
-
-    @Override
-    public void onEditTestDelete(int index, String text) {
-
-    }
-
-    @Override
-    public void onEditTestEnter(int index, String text) {
-
     }
 
     public void onTextChange(int index, boolean hasText) {

@@ -32,7 +32,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -247,7 +246,7 @@ public class NotesPreferenceActivity extends PreferenceActivity {
                 mHasAddedAccount = true;
                 Intent intent = new Intent("android.settings.ADD_ACCOUNT_SETTINGS");
                 intent.putExtra(AUTHORITIES_FILTER_KEY, new String[] {
-                        "gmail-ls"
+                    "gmail-ls"
                 });
                 startActivityForResult(intent, -1);
                 dialog.dismiss();
@@ -284,10 +283,8 @@ public class NotesPreferenceActivity extends PreferenceActivity {
         dialogBuilder.show();
     }
 
-    @NonNull
     private Account[] getGoogleAccounts() {
         AccountManager accountManager = AccountManager.get(this);
-
         return accountManager.getAccountsByType("com.google");
     }
 

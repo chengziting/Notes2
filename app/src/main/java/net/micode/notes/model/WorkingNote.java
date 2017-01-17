@@ -149,7 +149,7 @@ public class WorkingNote {
     private void loadNoteData() {
         Cursor cursor = mContext.getContentResolver().query(Notes.CONTENT_DATA_URI, DATA_PROJECTION,
                 DataColumns.NOTE_ID + "=?", new String[] {
-                        String.valueOf(mNoteId)
+                    String.valueOf(mNoteId)
                 }, null);
 
         if (cursor != null) {
@@ -175,7 +175,7 @@ public class WorkingNote {
     }
 
     public static WorkingNote createEmptyNote(Context context, long folderId, int widgetId,
-                                              int widgetType, int defaultBgColorId) {
+            int widgetType, int defaultBgColorId) {
         WorkingNote note = new WorkingNote(context, folderId);
         note.setBgColorId(defaultBgColorId);
         note.setWidgetId(widgetId);
@@ -243,7 +243,7 @@ public class WorkingNote {
         mIsDeleted = mark;
         if (mWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
                 && mWidgetType != Notes.TYPE_WIDGET_INVALIDE && mNoteSettingStatusListener != null) {
-            mNoteSettingStatusListener.onWidgetChanged();
+                mNoteSettingStatusListener.onWidgetChanged();
         }
     }
 

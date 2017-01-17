@@ -81,7 +81,7 @@ public class DataUtils {
     }
 
     public static boolean batchMoveToFolder(ContentResolver resolver, HashSet<Long> ids,
-                                            long folderId) {
+            long folderId) {
         if (ids == null) {
             Log.d(TAG, "the ids is null");
             return true;
@@ -184,8 +184,8 @@ public class DataUtils {
     public static boolean checkVisibleFolderName(ContentResolver resolver, String name) {
         Cursor cursor = resolver.query(Notes.CONTENT_NOTE_URI, null,
                 NoteColumns.TYPE + "=" + Notes.TYPE_FOLDER +
-                        " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER +
-                        " AND " + NoteColumns.SNIPPET + "=?",
+                " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER +
+                " AND " + NoteColumns.SNIPPET + "=?",
                 new String[] { name }, null);
         boolean exist = false;
         if(cursor != null) {
@@ -247,7 +247,7 @@ public class DataUtils {
         Cursor cursor = resolver.query(Notes.CONTENT_DATA_URI,
                 new String [] { CallNote.NOTE_ID },
                 CallNote.CALL_DATE + "=? AND " + CallNote.MIME_TYPE + "=? AND PHONE_NUMBERS_EQUAL("
-                        + CallNote.PHONE_NUMBER + ",?)",
+                + CallNote.PHONE_NUMBER + ",?)",
                 new String [] { String.valueOf(callDate), CallNote.CONTENT_ITEM_TYPE, phoneNumber },
                 null);
 

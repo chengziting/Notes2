@@ -1,4 +1,21 @@
+/*
+ * Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.micode.notes.data;
+
 
 import android.app.SearchManager;
 import android.content.ContentProvider;
@@ -9,22 +26,19 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
 import net.micode.notes.R;
-import net.micode.notes.data.Notes.NoteColumns;
 import net.micode.notes.data.Notes.DataColumns;
+import net.micode.notes.data.Notes.NoteColumns;
 import net.micode.notes.data.NotesDatabaseHelper.TABLE;
 
-/**
- * Created by 10191042 on 1/6/2017.
- */
-public class NotesProvider extends ContentProvider {
-    private static final UriMatcher s_matcher;
 
-    private NotesDatabaseHelper m_Helper;
+public class NotesProvider extends ContentProvider {
+    private static final UriMatcher mMatcher;
+
+    private NotesDatabaseHelper mHelper;
 
     private static final String TAG = "NotesProvider";
 
@@ -36,16 +50,15 @@ public class NotesProvider extends ContentProvider {
     private static final int URI_SEARCH          = 5;
     private static final int URI_SEARCH_SUGGEST  = 6;
 
-
     static {
-        s_matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        s_matcher.addURI(Notes.AUTHORITY, "note", URI_NOTE);
-        s_matcher.addURI(Notes.AUTHORITY, "note/#", URI_NOTE_ITEM);
-        s_matcher.addURI(Notes.AUTHORITY, "data", URI_DATA);
-        s_matcher.addURI(Notes.AUTHORITY, "data/#", URI_DATA_ITEM);
-        s_matcher.addURI(Notes.AUTHORITY, "search", URI_SEARCH);
-        s_matcher.addURI(Notes.AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, URI_SEARCH_SUGGEST);
-        s_matcher.addURI(Notes.AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY + "/*", URI_SEARCH_SUGGEST);
+        mMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        mMatcher.addURI(Notes.AUTHORITY, "note", URI_NOTE);
+        mMatcher.addURI(Notes.AUTHORITY, "note/#", URI_NOTE_ITEM);
+        mMatcher.addURI(Notes.AUTHORITY, "data", URI_DATA);
+        mMatcher.addURI(Notes.AUTHORITY, "data/#", URI_DATA_ITEM);
+        mMatcher.addURI(Notes.AUTHORITY, "search", URI_SEARCH);
+        mMatcher.addURI(Notes.AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, URI_SEARCH_SUGGEST);
+        mMatcher.addURI(Notes.AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY + "/*", URI_SEARCH_SUGGEST);
     }
 
     /**
@@ -53,49 +66,48 @@ public class NotesProvider extends ContentProvider {
      * we will trim '\n' and white space in order to show more information.
      */
     private static final String NOTES_SEARCH_PROJECTION = NoteColumns.ID + ","
-            + NoteColumns.ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_EXTRA_DATA + ","
-            + "TRIM(REPLACE(" + NoteColumns.SNIPPET + ", x'0A','')) AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ","
-            + "TRIM(REPLACE(" + NoteColumns.SNIPPET + ", x'0A','')) AS " + SearchManager.SUGGEST_COLUMN_TEXT_2 + ","
-            + R.drawable.search_result + " AS " + SearchManager.SUGGEST_COLUMN_ICON_1 + ","
-            + "'" + Intent.ACTION_VIEW + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_ACTION + ","
-            + "'" + Notes.TextNote.CONTENT_TYPE + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA;
+        + NoteColumns.ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_EXTRA_DATA + ","
+        + "TRIM(REPLACE(" + NoteColumns.SNIPPET + ", x'0A','')) AS " + SearchManager.SUGGEST_COLUMN_TEXT_1 + ","
+        + "TRIM(REPLACE(" + NoteColumns.SNIPPET + ", x'0A','')) AS " + SearchManager.SUGGEST_COLUMN_TEXT_2 + ","
+        + R.drawable.search_result + " AS " + SearchManager.SUGGEST_COLUMN_ICON_1 + ","
+        + "'" + Intent.ACTION_VIEW + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_ACTION + ","
+        + "'" + Notes.TextNote.CONTENT_TYPE + "' AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA;
 
     private static String NOTES_SNIPPET_SEARCH_QUERY = "SELECT " + NOTES_SEARCH_PROJECTION
-            + " FROM " + NotesDatabaseHelper.TABLE.NOTE
-            + " WHERE " + NoteColumns.SNIPPET + " LIKE ?"
-            + " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER
-            + " AND " + NoteColumns.TYPE + "=" + Notes.TYPE_NOTE;
-
+        + " FROM " + TABLE.NOTE
+        + " WHERE " + NoteColumns.SNIPPET + " LIKE ?"
+        + " AND " + NoteColumns.PARENT_ID + "<>" + Notes.ID_TRASH_FOLER
+        + " AND " + NoteColumns.TYPE + "=" + Notes.TYPE_NOTE;
 
     @Override
     public boolean onCreate() {
-        m_Helper = NotesDatabaseHelper.getInstance(getContext());
+        mHelper = NotesDatabaseHelper.getInstance(getContext());
         return true;
     }
 
-    @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+            String sortOrder) {
         Cursor c = null;
-        SQLiteDatabase db = m_Helper.getReadableDatabase();
+        SQLiteDatabase db = mHelper.getReadableDatabase();
         String id = null;
-        switch (s_matcher.match(uri)) {
+        switch (mMatcher.match(uri)) {
             case URI_NOTE:
-                c = db.query(NotesDatabaseHelper.TABLE.NOTE, projection, selection, selectionArgs, null, null,
+                c = db.query(TABLE.NOTE, projection, selection, selectionArgs, null, null,
                         sortOrder);
                 break;
             case URI_NOTE_ITEM:
                 id = uri.getPathSegments().get(1);
-                c = db.query(NotesDatabaseHelper.TABLE.NOTE, projection, NoteColumns.ID + "=" + id
+                c = db.query(TABLE.NOTE, projection, NoteColumns.ID + "=" + id
                         + parseSelection(selection), selectionArgs, null, null, sortOrder);
                 break;
             case URI_DATA:
-                c = db.query(NotesDatabaseHelper.TABLE.DATA, projection, selection, selectionArgs, null, null,
+                c = db.query(TABLE.DATA, projection, selection, selectionArgs, null, null,
                         sortOrder);
                 break;
             case URI_DATA_ITEM:
                 id = uri.getPathSegments().get(1);
-                c = db.query(NotesDatabaseHelper.TABLE.DATA, projection, DataColumns.ID + "=" + id
+                c = db.query(TABLE.DATA, projection, DataColumns.ID + "=" + id
                         + parseSelection(selection), selectionArgs, null, null, sortOrder);
                 break;
             case URI_SEARCH:
@@ -106,7 +118,7 @@ public class NotesProvider extends ContentProvider {
                 }
 
                 String searchString = null;
-                if (s_matcher.match(uri) == URI_SEARCH_SUGGEST) {
+                if (mMatcher.match(uri) == URI_SEARCH_SUGGEST) {
                     if (uri.getPathSegments().size() > 1) {
                         searchString = uri.getPathSegments().get(1);
                     }
@@ -135,20 +147,13 @@ public class NotesProvider extends ContentProvider {
         return c;
     }
 
-    @Nullable
-    @Override
-    public String getType(Uri uri) {
-        return null;
-    }
-
-    @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = m_Helper.getWritableDatabase();
+        SQLiteDatabase db = mHelper.getWritableDatabase();
         long dataId = 0, noteId = 0, insertedId = 0;
-        switch (s_matcher.match(uri)) {
+        switch (mMatcher.match(uri)) {
             case URI_NOTE:
-                insertedId = noteId = db.insert(NotesDatabaseHelper.TABLE.NOTE, null, values);
+                insertedId = noteId = db.insert(TABLE.NOTE, null, values);
                 break;
             case URI_DATA:
                 if (values.containsKey(DataColumns.NOTE_ID)) {
@@ -156,7 +161,7 @@ public class NotesProvider extends ContentProvider {
                 } else {
                     Log.d(TAG, "Wrong data format without note id:" + values.toString());
                 }
-                insertedId = dataId = db.insert(NotesDatabaseHelper.TABLE.DATA, null, values);
+                insertedId = dataId = db.insert(TABLE.DATA, null, values);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
@@ -180,9 +185,9 @@ public class NotesProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
         String id = null;
-        SQLiteDatabase db = m_Helper.getWritableDatabase();
+        SQLiteDatabase db = mHelper.getWritableDatabase();
         boolean deleteData = false;
-        switch (s_matcher.match(uri)) {
+        switch (mMatcher.match(uri)) {
             case URI_NOTE:
                 selection = "(" + selection + ") AND " + NoteColumns.ID + ">0 ";
                 count = db.delete(TABLE.NOTE, selection, selectionArgs);
@@ -197,7 +202,7 @@ public class NotesProvider extends ContentProvider {
                 if (noteId <= 0) {
                     break;
                 }
-                count = db.delete(NotesDatabaseHelper.TABLE.NOTE,
+                count = db.delete(TABLE.NOTE,
                         NoteColumns.ID + "=" + id + parseSelection(selection), selectionArgs);
                 break;
             case URI_DATA:
@@ -226,9 +231,9 @@ public class NotesProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int count = 0;
         String id = null;
-        SQLiteDatabase db = m_Helper.getWritableDatabase();
+        SQLiteDatabase db = mHelper.getWritableDatabase();
         boolean updateData = false;
-        switch (s_matcher.match(uri)) {
+        switch (mMatcher.match(uri)) {
             case URI_NOTE:
                 increaseNoteVersion(-1, selection, selectionArgs);
                 count = db.update(TABLE.NOTE, values, selection, selectionArgs);
@@ -288,8 +293,13 @@ public class NotesProvider extends ContentProvider {
             sql.append(selectString);
         }
 
-        m_Helper.getWritableDatabase().execSQL(sql.toString());
+        mHelper.getWritableDatabase().execSQL(sql.toString());
     }
 
+    @Override
+    public String getType(Uri uri) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

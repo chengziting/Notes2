@@ -1,63 +1,73 @@
+/*
+ * Copyright (c) 2010-2011, The MiCode Open Source Community (www.micode.net)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.micode.notes.data;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.ContactsContract;
-import android.support.annotation.Nullable;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.Data;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 
 import java.util.HashMap;
 
-/**
- * Created by 10191042 on 1/6/2017.
- */
 public class Contact {
-    private static HashMap<String,String> s_contactCache;
+    private static HashMap<String, String> sContactCache;
     private static final String TAG = "Contact";
 
-    private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL(" + ContactsContract.CommonDataKinds.Phone.NUMBER
-            + ",?) AND " + ContactsContract.RawContacts.Data.MIMETYPE + "='" + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "'"
-            + " AND " + ContactsContract.Data.RAW_CONTACT_ID + " IN "
+    private static final String CALLER_ID_SELECTION = "PHONE_NUMBERS_EQUAL(" + Phone.NUMBER
+    + ",?) AND " + Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'"
+    + " AND " + Data.RAW_CONTACT_ID + " IN "
             + "(SELECT raw_contact_id "
             + " FROM phone_lookup"
             + " WHERE min_match = '+')";
 
-    @Nullable
-    public static String getContact(Context context, String phoneNum){
-        if(s_contactCache == null){
-            s_contactCache = new HashMap<String,String>();
+    public static String getContact(Context context, String phoneNumber) {
+        if(sContactCache == null) {
+            sContactCache = new HashMap<String, String>();
         }
 
-        if(s_contactCache.containsKey(phoneNum)){
-            return s_contactCache.get(phoneNum);
+        if(sContactCache.containsKey(phoneNumber)) {
+            return sContactCache.get(phoneNumber);
         }
 
-        String selection = CALLER_ID_SELECTION.replace("+", PhoneNumberUtils.toCallerIDMinMatch(phoneNum));
-        Cursor cursor = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME},
+        String selection = CALLER_ID_SELECTION.replace("+",
+                PhoneNumberUtils.toCallerIDMinMatch(phoneNumber));
+        Cursor cursor = context.getContentResolver().query(
+                Data.CONTENT_URI,
+                new String [] { Phone.DISPLAY_NAME },
                 selection,
-                new String[]{phoneNum},
+                new String[] { phoneNumber },
                 null);
 
-        if(cursor != null && cursor.moveToFirst()){
+        if (cursor != null && cursor.moveToFirst()) {
             try {
                 String name = cursor.getString(0);
-                s_contactCache.put(phoneNum,name);
+                sContactCache.put(phoneNumber, name);
                 return name;
-
-            }catch (IndexOutOfBoundsException e){
-                Log.e(TAG,e.getMessage());
+            } catch (IndexOutOfBoundsException e) {
+                Log.e(TAG, " Cursor get string error " + e.toString());
                 return null;
-            }
-            finally {
+            } finally {
                 cursor.close();
             }
-        }
-        else {
-            Log.d(TAG,"No contact matched with phonenum:"+phoneNum);
+        } else {
+            Log.d(TAG, "No contact matched with number:" + phoneNumber);
             return null;
         }
-
     }
 }
